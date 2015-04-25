@@ -22,6 +22,8 @@ function init(){
         zoom: 8,
         layers: [base_hotosm,shakeContours]
     });
+    
+    map.scrollWheelZoom.disable();
 
     L.control.layers({
         'HOT OSM':base_hotosm,
