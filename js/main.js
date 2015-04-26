@@ -18,10 +18,12 @@ function init(){
     });
     
     var map = L.map('crisis-map', {
-        center: [28.0333, 84.7333],
+        center: [27.9, 84.7333],
         zoom: 8,
         layers: [base_hotosm,shakeContours]
     });
+    
+    map.scrollWheelZoom.disable();
 
     L.control.layers({
         'HOT OSM':base_hotosm,
