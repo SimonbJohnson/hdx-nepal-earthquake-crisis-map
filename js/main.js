@@ -35,7 +35,7 @@ function init(){
     
     var map = L.map('crisis-map', {
         center: [27.72, 85.3333],
-        zoom: 11,
+        zoom: 10,
         layers: [base_hotosm,nepalStats,shakeContours,idps]
     });
     
