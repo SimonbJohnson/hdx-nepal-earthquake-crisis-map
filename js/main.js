@@ -17,10 +17,26 @@ function init(){
         }
     });
     
+    var nepalStats = L.geoJson(nepalStatsGeo,{
+        style: nepalStatsStyle,
+        onEachFeature: function (feature, layer) {
+            //layer.bindPopup("<b>" + feature.properties.NAMEUSE + " ("+feature.properties.PCODEUSE+")</b><br />New Cases in the last 4 weeks: "+newCases[feature.properties.PCODEUSE]);
+        }
+    });
+    
+    var idps = L.geoJson(idps_geo, {
+        pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng,idpsStyle());
+        },
+        onEachFeature: function (feature, layer) {
+            //layer.bindPopup("Centre ID: "+feature.properties["Centre ID"]+"<br />Centre Name: "+feature.properties["Center"]+"<br />Type: "+feature.properties["Type"]+"<br />Activity: "+feature.properties["Activity"]+"<br />Org: "+feature.properties["Org"]);
+        }        
+    });  
+    
     var map = L.map('crisis-map', {
-        center: [27.9, 84.7333],
-        zoom: 8,
-        layers: [base_hotosm,shakeContours]
+        center: [27.72, 85.3333],
+        zoom: 10,
+        layers: [base_hotosm,nepalStats,shakeContours,idps]
     });
     
     map.scrollWheelZoom.disable();
@@ -29,46 +45,64 @@ function init(){
         'HOT OSM':base_hotosm,
         'OSM':base_osm
     }, {
-        'Shake Contours':shakeContours
+        'Shake Contours':shakeContours,
+        'Deaths':nepalStats,
+        'IDPs':idps
     }).addTo(map);   
     
-    var shakeContoursLegend = L.control({position: 'bottomleft'});
+    var shakeContoursLegend = L.control({position: 'bottomleft'});    
     
     shakeContoursLegend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'infolegend');
             div.innerHTML +=newCasesLegendContent();
         return div;
     };
+    
+    var nepalStatsLegend = L.control({position: 'bottomleft'});    
+    
+    nepalStatsLegend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'infolegend');
+            div.innerHTML +=nepalStatsLegendContent();
+        return div;
+    };
+    
+    var idpsLegend = L.control({position: 'bottomleft'});    
+    
+    idpsLegend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'infolegend');
+            div.innerHTML +=idpsLegendContent();
+        return div;
+    };        
 
     map.on('overlayadd', function (eventLayer) {
         if(eventLayer.name=="Shake Contours"){
             shakeContoursLegend.addTo(this);
-        };        
+        };
+        if(eventLayer.name=="Deaths"){
+            nepalStatsLegend.addTo(this);
+        };
+        if(eventLayer.name=="IDPS"){
+            idpsLegend.addTo(this);
+        };          
     });
     
     map.on('overlayremove', function (eventLayer) {
         if(eventLayer.name=="Shake Contours"){
             this.removeControl(shakeContoursLegend);
-        };          
+        };
+        if(eventLayer.name=="Deaths"){
+            this.removeControl(nepalStatsLegend);
+        };
+        if(eventLayer.name=="IDPs"){
+            this.removeControl(idpsLegend);
+        };        
     });
     
+    nepalStatsLegend.addTo(map);
     shakeContoursLegend.addTo(map);
+    idpsLegend.addTo(map);
     
     return map;    
-}
-
-
-function resize(){
-    $('#map').height($(window).height()-$('#header').height()-10);
-    map.invalidateSize(false);
-}
-
-$(window).load(function(){
-    resize();
-});
-$(window).resize(function(){
-    resize();
-});
-    
+}   
 
 var map = init();
